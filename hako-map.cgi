@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.4 2004/04/27 02:41:23 gaba Exp $
+# $Id: hako-map.cgi,v 1.5 2004/11/02 01:47:57 gaba Exp $
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -461,16 +461,16 @@ END
 # 地図の表示
 # 引数が1なら、ミサイル基地等をそのまま表示
 sub islandMap {
-	my($mode) = @_;
+	my($mode, $js) = @_;
 	my($island);
 	$island = $Hislands[$HcurrentNumber];
-
-	out("<CENTER><TABLE BORDER><TR><TD>");
 
 	# 地形、地形値を取得
 	my($land) = $island->{'land'};
 	my($landValue) = $island->{'landValue'};
 	my($l, $lv);
+
+	out("<CENTER><TABLE BORDER><TR><TD>");
 
 	# コマンド取得
 	my($command) = $island->{'command'};
@@ -501,7 +501,7 @@ sub islandMap {
 		for($x = 0; $x < $HislandSize; $x++) {
 			$l = $land->[$x][$y];
 			$lv = $landValue->[$x][$y];
-			landString($l, $lv, $x, $y, $mode, $comStr[$x][$y]);
+			landString($l, $lv, $x, $y, $mode, $comStr[$x][$y], $js);
 		}
 
 		# 奇数行目なら番号を出力
@@ -634,8 +634,119 @@ sub landString {
 		out("<A HREF=\"JavaScript:void(0);\" onMouseOver=\"ShowMsg('$point $alt $comStr'); return true;\">");
 	}
 
-	out("<IMG SRC=\"$image\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0></A>");
+	out("<IMG SRC=\"$image\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0  ID='${x}x${y}'></A>");
 
+}
+
+sub islandMarking {
+   out(<<END);
+<script type="text/javascript">
+<!--
+var mArray = new Array();
+var lastX = 0;
+var lastY = 0;
+var lastN = 19;
+
+// ミサイル範囲のマーキングをセット
+function set_mark(x, y) {
+   if(!document.mark_form.mark.checked) return false;
+   if(!document.getElementById) {
+      alert("大変申し訳ありませんが、お使いのブラウザはこの機能をサポートしていません。");
+      return false;
+   }
+
+   var num  = document.mark_form.number_mark.value;
+   var kind = document.mark_form.kind_mark.value;
+
+   if(kind == '') {
+      do_mark(lastX, lastY, lastN, '-');
+
+      lastX = x;
+      lastY = y;
+      kind = 'FFFF00';
+   }
+
+   do_mark(x, y, num, kind);
+}
+
+function do_mark(x, y, num, kind) {
+   var xArray = new Array(0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
+   var yArray = new Array(0,-1, 0, 1, 1, 0,-1,-2,-1, 0, 1, 2, 2, 2, 1, 0,-1,-2,-2);
+
+   for (i = 0; i < num; i++) {
+      var targetX = x + xArray[i];
+      var targetY = y + yArray[i];
+
+      // 行による位置調整
+      if(((targetY % 2) == 0) && ((y % 2) == 1)) {
+         targetX = targetX - 1;
+      }
+      if(!(targetX < 0 || targetX >= $HislandSize || targetY < 0 || targetY >= $HislandSize)) {
+         if(kind == '-') {
+            unset_highlight(targetX, targetY);
+            mArray[targetX+"x"+targetY] = 0;
+         } else {
+            set_highlight(targetX, targetY, kind);
+            mArray[targetX+"x"+targetY] = 1;
+         }
+      }
+   }
+}
+
+// 画像をマーキング化
+function set_highlight(x, y, color) {
+   if(document.getElementById) {
+      document.getElementById(x+"x"+y).width  = "30";
+      document.getElementById(x+"x"+y).height = "30";
+      document.getElementById(x+"x"+y).border = "1";
+      document.getElementById(x+"x"+y).style.borderColor = "#"+color;
+   }
+}
+
+// マーキング解除
+function unset_highlight(x, y) {
+   if(document.getElementById) {
+      document.getElementById(x+"x"+y).width  = "32";
+      document.getElementById(x+"x"+y).height = "32";
+      document.getElementById(x+"x"+y).border = "0";
+   }
+}
+
+// 全てのマーキングを解除
+function unset_all_highlight() {
+   for (f=0;f<$HislandSize;f++) {
+      for (i=0;i<$HislandSize;i++) {
+         if(mArray[i+"x"+f] == 1) {
+            unset_highlight(i, f);
+         }
+      }
+   }
+}
+                                                                                                                            //-->
+</script>
+
+<FORM NAME="mark_form">
+マーキング<INPUT TYPE=CHECKBOX NAME="mark">
+種類
+<SELECT NAME="kind_mark">
+<OPTION VALUE="">標準
+<OPTION VALUE="FFFF00">Yellow
+<OPTION VALUE="FF0000">Red
+<OPTION VALUE="0000FF">Blue
+<OPTION VALUE="00FF00">Green
+<OPTION VALUE="FF00FF">Purple
+<OPTION VALUE="CCCCBB">Gray
+<OPTION VALUE="-">None
+</SELECT>
+範囲
+<SELECT NAME="number_mark">
+<OPTION VALUE="1">0HEX
+<OPTION VALUE="7">1HEX
+<OPTION VALUE="19" SELECTED>2HEX
+</SELECT>
+　<INPUT TYPE="BUTTON" VALUE="解除" onClick="unset_all_highlight();">
+</FORM>
+END
 }
 
 
@@ -682,9 +793,13 @@ $HtempBack<BR>
 <SCRIPT Language="JavaScript">
 <!--
 function ps(x, y) {
-	document.forms[0].elements[4].options[x].selected = true;
-	document.forms[0].elements[5].options[y].selected = true;
-	return true;
+   if(document.mark_form.mark.checked) {
+      set_mark(x, y);
+   } else {
+      document.forms[0].elements[4].options[x].selected = true;
+      document.forms[0].elements[5].options[y].selected = true;
+   }
+   return true;
 }
 
 function ns(x) {
@@ -809,6 +924,8 @@ END
 <TEXTAREA NAME="COMSTATUS" cols="48" rows="2"></TEXTAREA></center>
 END
 	islandMap(1);	# 島の地図、所有者モード
+    out("</FORM>");
+    islandMarking();
 	out(<<END);
 </TD>
 <TD $HbgCommandCell>
@@ -818,7 +935,6 @@ END
 	}
 
 	out(<<END);
-</FORM>
 </TD>
 </TR>
 </TABLE>

@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # JS開発画面モジュール
-# $Id: hako-js.cgi,v 1.3 2004/04/27 02:41:23 gaba Exp $
+# $Id: hako-js.cgi,v 1.4 2004/11/02 01:47:57 gaba Exp $
 
 #----------------------------------------------------------------------
 # Ｊａｖａスクリプト開発画面
@@ -111,18 +111,8 @@ function init(){
 	str = plchg();
 	str = "<NOBR><font color=blue>−−−− <B>送信済み</B> −−−−</font></NOBR><br>"+str;
 	disp(str, "#ccffcc");
+    check_menu();
 
-	/*
-	if(isIE4){
-		window.document.onmouseup = menuclose;
-	} else {
-		document.captureEvents(Event.MOUSEDOWN)
-		document.onmousedown = getMouseData;
-		if(!(isNN6)) {
-			window.document.onmouseup = menuclose;
-		}
-	}
-	*/
 }
 
 function cominput(x, k, z) {
@@ -284,10 +274,14 @@ function outp(){
 }
 
 function ps(x, y) {
-	document.forms[0].elements[4].options[x].selected = true;
-	document.forms[0].elements[5].options[y].selected = true;
-	showMenu();
-	return true;
+   if(document.mark_form.mark.checked) {
+      set_mark(x, y);
+   } else {
+      document.forms[0].elements[4].options[x].selected = true;
+      document.forms[0].elements[5].options[y].selected = true;
+      showMenu();
+   }
+   return true;
 }
 
 function ns(x) {
@@ -366,9 +360,18 @@ function menuclose() {
 	}
 }
 
-function getMouseData(e) {
-	mouseX = e.pageX;
-	mouseY = e.pageY;
+function Mmove(e){
+   mouseX = e.pageX;
+   mouseY = e.pageY;
+}
+
+function check_menu(){
+   if((isNN6) && !(isIE4)) {
+      document.onmousemove = Mmove;
+   } else if(isNN4){
+      window.captureEvents(Event.MOUSEMOVE);
+      window.onMouseMove = Mmove;
+   }
 }
 
 //-->
@@ -513,10 +516,11 @@ END
 挿入・上書き・削除で計画の入力が出来ます。
 </TEXTAREA></center>
 END
-	islandMapJava(1);	# 島の地図、所有者モード
+	islandMap(1, 1);	# 島の地図、所有者モード
+    out("</FORM>");
+    islandMarking();
 	my $comment = $Hislands[$HcurrentNumber]->{'comment'};
 	out(<<END);
-</FORM>
 </TD>
 <TD $HbgCommandCell id="plan">
 <ilayer name="PARENT_LINKMSG" width="100%" height="100%">
@@ -584,64 +588,6 @@ sub commandJavaMain {
 }
 
 #----------------------------------------------------------------------
-# 地図の表示
-#----------------------------------------------------------------------
-sub islandMapJava {
-	my($mode) = @_;
-	my($island);
-	$island = $Hislands[$HcurrentNumber];
-
-	# 地形、地形値を取得
-	my($land) = $island->{'land'};
-	my($landValue) = $island->{'landValue'};
-	my($l, $lv);
-
-	out("<CENTER><TABLE BORDER><TR><TD>");
-
-	# コマンド取得
-	my($command) = $island->{'command'};
-	my($com, @comStr, $i);
-	if($HmainMode eq 'owner') {
-		for($i = 0; $i < $HcommandMax; $i++) {
-			my($j) = $i + 1;
-			$com = $command->[$i];
-			if($com->{'kind'} < 21) {
-				$comStr[$com->{'x'}][$com->{'y'}] .=
-					" [${j}]$HcomName[$com->{'kind'}]";
-			}
-		}
-	}
-
-	# 座標(上)を出力
-	out("<IMG SRC=\"xbar.gif\" width=400 height=16><BR>");
-
-	# 各地形および改行を出力
-	my($x, $y);
-	for($y = 0; $y < $HislandSize; $y++) {
-		# 偶数行目なら番号を出力
-		if(($y % 2) == 0) {
-			out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
-		}
-
-		# 各地形を出力
-		for($x = 0; $x < $HislandSize; $x++) {
-			$l = $land->[$x][$y];
-			$lv = $landValue->[$x][$y];
-			landString($l, $lv, $x, $y, $mode, $comStr[$x][$y], 1);
-		}
-
-		# 奇数行目なら番号を出力
-		if(($y % 2) == 1) {
-			out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
-		}
-
-		# 改行を出力
-		out("<BR>");
-	}
-	out("</TD></TR></TABLE></CENTER>\n");
-}
-
-#----------------------------------------------------------------------
 # 観光モード
 #----------------------------------------------------------------------
 sub printIslandJava {
@@ -679,10 +625,14 @@ isNN6 = (document.getElementById);
 	}
 
 function ps(x, y) {
-	window.opener.document.myForm.POINTX.options[x].selected = true;
-	window.opener.document.myForm.POINTY.options[y].selected = true;
-	showMenu();
-	return true;
+   if(document.mark_form.mark.checked) {
+      set_mark(x, y);
+   } else {
+    window.opener.document.myForm.POINTX.options[x].selected = true;
+    window.opener.document.myForm.POINTY.options[y].selected = true;
+    showMenu();
+    }
+    return true;
 }
 
 function showMenu() {
@@ -760,7 +710,8 @@ END
 <center>${HtagBig_}${HtagName_}「${HcurrentName}島」${H_tagName}${H_tagBig}
 </center>
 END
-	islandMapJava(0);  # 島の地図、観光モード
+	islandMap(0, 1);  # 島の地図、観光モード
+    islandMarking();
 	landStringFlash(); # 擬似ＭＡＰデータ表示
 
 	# 近況
