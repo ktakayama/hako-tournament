@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.5 2004/11/02 01:47:57 gaba Exp $
+# $Id: hako-map.cgi,v 1.6 2004/11/03 11:00:40 gaba Exp $
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -634,7 +634,7 @@ sub landString {
 		out("<A HREF=\"JavaScript:void(0);\" onMouseOver=\"ShowMsg('$point $alt $comStr'); return true;\">");
 	}
 
-	out("<IMG SRC=\"$image\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0  ID='${x}x${y}'></A>");
+	out("<IMG SRC=\"$image\" TITLE=\"$point $alt $comStr\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0  ID='${x}x${y}'></A>");
 
 }
 
