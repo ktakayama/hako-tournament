@@ -3,12 +3,12 @@
 # ============================================================= #
 #                                                               #
 #   アクセスログ解析ツール                                      #
-#   Web notes  (http://espion.s7.xrea.com/)                     #
-#   ドン・ガバチョ (support@mc.neweb.ne.jp)                     #
+#   鷹の島 (http://espion.just-size.jp/)                        #
+#   Kyosuke Takayama (support@mc.neweb.ne.jp)                   #
 #                                                               #
 #                                                               #
 # ============================================================= #
-# $Id: access.cgi,v 1.2 2004/02/18 04:42:31 gaba Exp $
+# $Id: access.cgi,v 1.3 2004/06/03 01:59:14 gaba Exp $
 
 use strict;
 
@@ -147,7 +147,7 @@ sub html_footer {
 	print <<_HTML_;
 <HR>
 <DIV ALIGN="RIGHT">
-<A HREF="http://espion.s7.xrea.com/">Web notes</A></DIV>
+<A HREF="http://espion.just-size.jp/">鷹の島</A></DIV>
 </BODY>
 </HTML>
 _HTML_

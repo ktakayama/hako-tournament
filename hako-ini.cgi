@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 設定ファイル
-# $Id: hako-ini.cgi,v 1.5 2004/04/27 02:44:10 gaba Exp $
+# $Id: hako-ini.cgi,v 1.6 2004/06/03 01:59:15 gaba Exp $
 
 #----------------------------------------------------------------------
 # 各種設定値
@@ -33,7 +33,7 @@ $masterPassword		= 'master';					# マスターパスワード
 $HspecialPassword	= 'special';				# 特殊パスワード
 $adminName			= '管理者の名前';			# 管理者名
 $email				= '管理者@どこ.どこ.どこ';	# 管理者のメールアドレス
-$version			= "0.91";					# バージョン表記用（基本的に変更しないように！）
+$version			= "0.92";					# バージョン表記用（基本的に変更しないように！）
 
 $HdirMode			= 0755;						# データディレクトリのパーミッション
 $HdirName			= 'data';					# データディレクトリの名前
@@ -286,8 +286,7 @@ $Htitle
 $Body
 　<A HREF="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html">箱庭諸島スクリプト配布元</A>
  / <A HREF="http://appoh.execweb.cx/hakoniwa/" target=_blank>箱庭Javaスクリプト版 配布元 </A>
- / <A HREF="http://espion.s7.xrea.com/tyotou/" target=_blank>箱庭トーナメント２ 配布元 </A>
- / <A HREF="http://espion.s7.xrea.com/tyotou/tournament/ml.html" target=_blank>トーナメントメーリングリスト</A>
+ / <A HREF="http://espion.just-size.jp/archives/dist_hako/" target=_blank>箱庭トーナメント２ 配布元 </A>
 <B><BR>
 <A HREF="$toppage">トップページ</A>
  / <A HREF="$bbs">$bbsname</A>
@@ -311,7 +310,6 @@ sub tempFooter {
 <P align=right>
 <NOBR>
 <A HREF="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html" target=_blank>箱庭諸島スクリプト配布元</A>
-　　<A HREF="http://espion.s7.xrea.com/tyotou/" target=_blank>箱庭緒島のページ</A>
 　　<A HREF="$toppage">トップページ</A>
 　　<A HREF="$bbs">$bbsname</A>
 　　<A HREF="$HthisFile?LogFileView=1" target=_blank>最近の出来事</A>
