@@ -11,7 +11,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # メインスクリプト
-# $Id: hako-main.cgi,v 1.1 2003/05/15 02:08:55 gaba Exp $
+# $Id: hako-main.cgi,v 1.2 2003/07/02 02:45:27 gaba Exp $
 
 # 設定ファイル読み込み
 require ('hako-ini.cgi');
@@ -838,7 +838,7 @@ sub cgiInput {
 		$HmainMode = 'change';
 	} elsif($getLine =~ /LogFileView=([0-9]*)/) {
 		$HmainMode = 'logView';
-		$Hlogturn = $1;
+		$Hlogturn = ($1 > $HlogMax) ? $HlogMax : $1;
 	} elsif($getLine =~ /help/) {
 		$HmainMode = 'helpView';
 	} elsif($getLine =~ /exp/) {
