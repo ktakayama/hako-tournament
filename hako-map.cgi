@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.1 2003/05/15 02:08:55 gaba Exp $
+# $Id: hako-map.cgi,v 1.2 2003/10/28 01:46:47 gaba Exp $
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -1124,6 +1124,12 @@ END
 sub write_access_log {
 	my $view = $_[0];
 
+	foreach (%ENV) {
+		s/&(?!(?:amp|quot|lt|gt);)/&amp;/g;
+		s/"/&quot;/g;
+		s/</&lt;/g;
+		s/>/&gt;/g;
+	}
 	my $xip = $ENV{'HTTP_X_FORWARDED_FOR'};
 	my $ip  = $ENV{'REMOTE_ADDR'};
 
@@ -1131,9 +1137,9 @@ sub write_access_log {
 	$month ++;
 
 	my($log_file) = $Hdiraccess."/" . $month . "-" . $day . ".cgi";
+	my($agent) = $ENV{'HTTP_USER_AGENT'};
 	open(ACS, ">>${log_file}");
-	#printf ACS "%04d\/%02d\/%02d %02d:%02d:%02d", $year, $month, $day, $hour, $min, $sec;
-	print  ACS time() . ", ${ip}, ${xip}, ${HcurrentID}, ${HcurrentName}島, ${view}, $ENV{'HTTP_USER_AGENT'},\n";
+	print  ACS time() . ", ${ip}, ${xip}, ${HcurrentID}, ${HcurrentName}島, ${view}, ${agent},\n";
 	close(ACS);
 }
 
