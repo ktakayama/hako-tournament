@@ -172,7 +172,7 @@ END
 		my $kaisen = ($i*2 > $HfightMem) ? "決勝" : "第$fitNum回";
 		# ターン行程の日程表示用
 		if(!$Htime_mode and !$v_mode and $HislandTurn + 1 >= $HyosenTurn and $HislandTurn + 1 <= $fitone) {
-			$v_time = (($fitone - $HislandTurn) / $HdeveRepCount) * $HdevelopeTime + $HislandLastTime;
+			$v_time += (($fitone - $HislandTurn) / $HdeveRepCount - 1) * $HdevelopeTime + $HislandLastTime;
 			my($sec,$min,$hour,$mday,$mon) = get_time($v_time);
 			$v_text = "　〜　".$mon."月".$mday."日".$hour."時".$min."分";
 			$v_mode = 1;
@@ -194,7 +194,7 @@ END
 END
 		# ターン行程の日程表示用
 		if(!$Htime_mode and !$v_mode and $HislandTurn + 1 >= $fitone and $HislandTurn + 1 <= $fittwo) {
-			$v_time = (($fittwo - $HislandTurn) / $HfightRepCount - 1) * $HfightTime + $HislandLastTime + $HunitTime;
+			$v_time += (($fittwo - $HislandTurn) / $HfightRepCount - 1) * $HfightTime + $HislandLastTime;
 			my($sec,$min,$hour,$mday,$mon) = get_time($v_time);
 			$v_text = "　〜　".$mon."月".$mday."日".$hour."時".$min."分";
 			$v_mode = 1;
