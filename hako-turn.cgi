@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ターン進行モジュール
-# $Id: hako-turn.cgi,v 1.1 2003/05/15 02:08:55 gaba Exp $
+# $Id: hako-turn.cgi,v 1.2 2004/02/18 04:42:31 gaba Exp $
 
 # 周囲2ヘックスの座標
 my(@ax) = (0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
@@ -167,7 +167,7 @@ sub makeNewLand {
 	}
 
 	# 中央の4*4に荒地を配置
-	my($center) = $HislandSize / 2 - 1;
+	my($center) = int($HislandSize / 2 - 1);
 	for($y = $center - 1; $y < $center + 3; $y++) {
 		 for($x = $center - 1; $x < $center + 3; $x++) {
 			 $land[$x][$y] = $HlandWaste;
@@ -204,12 +204,12 @@ sub makeNewLand {
 
 	makeRandomPointArray();
 	for($i = 0; $i < $HpointNumber; $i++) {
+		last if($seacon == $HseaNum);
 		$x = $Hrpx[$i];
 		$y = $Hrpy[$i];
 		if(countAround(\@land, $x, $y, $HlandPlains, 7) and $land[$x][$y] == $HlandSea and $landValue[$x][$y] == $sea_flag){
 			$landValue[$x][$y] = ($landValue[$x][$y] == 1) ? 0 : 1;
-			$seacon++;
-			last if($seacon == $HseaNum);
+			$seacon += $sea_flag ? -1: 1;
 		}
 	}
 

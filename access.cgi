@@ -8,7 +8,7 @@
 #                                                               #
 #                                                               #
 # ============================================================= #
-# $Id: access.cgi,v 1.1 2003/05/15 02:08:55 gaba Exp $
+# $Id: access.cgi,v 1.2 2004/02/18 04:42:31 gaba Exp $
 
 use strict;
 
@@ -51,7 +51,7 @@ if(pass_check()) {
 
 # -- フォームからのデータ処理 --------------------------------- #
 sub decode {
-	my $buffer;
+	my ($buffer, $i);
 
 	return if($ENV{'CONTENT_LENGTH'} > 51200);
 	read(STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
@@ -62,6 +62,7 @@ sub decode {
 		$value =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack('H2', $1)/eg;
 
 		$Q{$name} = $value;
+		last if($i > 200 and $i++);
 	}
 }
 

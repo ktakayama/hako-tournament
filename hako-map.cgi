@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.2 2003/10/28 01:46:47 gaba Exp $
+# $Id: hako-map.cgi,v 1.3 2004/02/18 04:42:31 gaba Exp $
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -1122,6 +1122,7 @@ END
 
 # アクセスログ保存
 sub write_access_log {
+	my $i;
 	my $view = $_[0];
 
 	foreach (%ENV) {
@@ -1129,6 +1130,7 @@ sub write_access_log {
 		s/"/&quot;/g;
 		s/</&lt;/g;
 		s/>/&gt;/g;
+		last if($i > 200 and $i++);
 	}
 	my $xip = $ENV{'HTTP_X_FORWARDED_FOR'};
 	my $ip  = $ENV{'REMOTE_ADDR'};

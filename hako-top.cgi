@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # トップモジュール
-# $Id: hako-top.cgi,v 1.1 2003/05/15 02:08:55 gaba Exp $
+# $Id: hako-top.cgi,v 1.2 2004/02/18 04:42:31 gaba Exp $
 
 #----------------------------------------------------------------------
 # トップページモード
@@ -109,11 +109,11 @@ END
 <SCRIPT language="JavaScript">
 <!--
 function develope(){
-	window.open("", "newWinTyotouA","menubar=no,toolbar=no,location=no,directories=no,status=yes,scrollbars=yes,resizable=yes,width=800,height=640");
+	//window.open("", "newWinTyotouA","menubar=no,toolbar=no,location=no,directories=no,status=yes,scrollbars=yes,resizable=yes,width=800,height=640");
 	document.Island.target = "newWinTyotouA";
 	document.Island.submit();
 	document.Island.target = "";
-				return true;
+	return true;
 }
 
 //-->
