@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.7 2004/11/10 13:00:48 gaba Exp $
+# $Id: hako-map.cgi,v 1.8 2004/11/10 13:45:13 gaba Exp $
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -367,8 +367,6 @@ sub islandInfo {
 	$farm = ($farm == 0) ? "保有せず" : "${farm}0$HunitPop";
 	$factory = ($factory == 0) ? "保有せず" : "${factory}0$HunitPop";
 	$mountain = ($mountain == 0) ? "保有せず" : "${mountain}0$HunitPop";
-	$farm 	  = "機密" if($Hhide_farm == 2);
-	$factory  = "機密" if($Hhide_factory == 2);
 
 	my($mStr1) = '';
 	my($mStr2) = '';
@@ -383,6 +381,10 @@ sub islandInfo {
 		$mStr1 = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}資金${H_tagTH}</NOBR></TH>";
 		$mStr2 = "<TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$mTmp</NOBR></TD>";
 		$cmt_++;
+
+		$farm 	  = "機密" if($Hhide_farm == 2);
+		$factory  = "機密" if($Hhide_factory == 2);
+
 	}
 
 	my($comname) ="${HtagTH_}コメント：${H_tagTH}";
@@ -569,7 +571,7 @@ sub landString {
 
 		$image = "land${p}.gif";
 		$alt = "$n(${lv}$HunitPop)";
-		$alt = $n if($Hhide_town);
+		$alt = $n if($Hhide_town and $mode == 0);
 	} elsif($l == $HlandFarm) {
 		# 農場
 		$image = 'land7.gif';
