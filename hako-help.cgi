@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ヘルプモジュール
-# $Id: hako-help.cgi,v 1.3 2004/11/06 02:28:45 gaba Exp $
+# $Id: hako-help.cgi,v 1.4 2004/11/10 13:43:58 gaba Exp $
 
 #----------------------------------------------------------------------
 # ヘルプページモード
@@ -28,15 +28,15 @@ sub tempHelpPage {
 	$HdisFallBorder++;
 
 	$yosrep = '（' . $HyosenRepCount . 'ターンまとめて更新）' if($HyosenRepCount > 1);
-	$devrep = '（' . $HdeveRepCount . 'ターンまとめて更新）' if($HdeveRepCount > 1);
+	$devrep = '（' . $HdeveRepCount . 'ターンまとめて更新）'  if($HdeveRepCount > 1);
 	$firep  = '（' . $HfightRepCount . 'ターンまとめて更新）' if($HfightRepCount > 1);
 
-	$hide_mon = ($HhideMoneyMode) ? (($HhideMoneyMode == 2) ? "100の位で四捨五入" : "見える") : "隠蔽";
-	$hide_twn = ($Hhide_town) ? "規模を隠蔽" : "見える";
-	$hide_frm = ($Hhide_farm) ? (($Hhide_farm == 2) ? "森に偽装(規模も隠蔽)" : "森に偽装") : "見える";
-	$hide_fac = ($Hhide_factory) ? (($Hhide_factory == 2) ? "森に偽装(規模も隠蔽)" : "森に偽装") : "見える";
-	$hide_mis = ($Hhide_missile)  ? "森に偽装" : "見える";
-	$hide_def = ($Hhide_deffence) ? "森に偽装" : "見える";
+	$hide_mon = qw(隠蔽 見える 100の位で四捨五入)[$HhideMoneyMode];
+	$hide_twn = qw(見える 規模を隠蔽)[$Hhide_town];
+	$hide_frm = qw(見える 森に偽装 森に偽装\(規模も隠蔽\))[$Hhide_farm];
+	$hide_fac = qw(見える 森に偽装 森に偽装\(規模も隠蔽\))[$Hhide_factory];
+	$hide_mis = qw(見える 森に偽装)[$Hhide_missile];
+	$hide_def = qw(見える 森に偽装)[$Hhide_deffence];
 
 	# 報酬金設定を表示
     my $price;
