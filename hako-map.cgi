@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.6 2004/11/03 11:00:40 gaba Exp $
+# $Id: hako-map.cgi,v 1.7 2004/11/10 13:00:48 gaba Exp $
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -661,6 +661,11 @@ function set_mark(x, y) {
    if(kind == '') {
       do_mark(lastX, lastY, lastN, '-');
 
+      if(lastX == x && lastY == y) {
+         lastX = 0;
+         lastY = 0;
+         return;
+      }
       lastX = x;
       lastY = y;
       kind = 'FFFF00';
