@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.8 2004/11/10 13:45:13 gaba Exp $
+# $Id$
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -648,6 +648,7 @@ var mArray = new Array();
 var lastX = 0;
 var lastY = 0;
 var lastN = 19;
+var lastF = 0;
 
 // ミサイル範囲のマーキングをセット
 function set_mark(x, y) {
@@ -663,13 +664,15 @@ function set_mark(x, y) {
    if(kind == '') {
       do_mark(lastX, lastY, lastN, '-');
 
-      if(lastX == x && lastY == y) {
+      if(lastF == 1 && lastX == x && lastY == y) {
          lastX = 0;
          lastY = 0;
+         lastF = 0;
          return;
       }
       lastX = x;
       lastY = y;
+      lastF = 1;
       kind = 'FFFF00';
    }
 
