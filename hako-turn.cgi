@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ターン進行モジュール
-# $Id: hako-turn.cgi,v 1.6 2004/11/10 13:01:25 gaba Exp $
+# $Id$
 
 # 周囲2ヘックスの座標
 my(@ax) = (0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
@@ -1308,8 +1308,13 @@ sub doCommand {
 					# 荒地(被害なし)
 					logMsWaste($id, $target, $name, $tName,	$comName, $tLname, $point, $tPoint);
 				} else {
-					# 通常地形
-					logMsNormal($id, $target, $name, $tName, $comName, $tLname, $point, $tPoint);
+					if($tL == $HlandTown) {
+						# 都市
+						logMsTown($id, $target, $name, $tName, $comName, $tLname, $point, $tPoint, $tLv);
+					} else {
+						# 通常地形
+						logMsNormal($id, $target, $name, $tName, $comName, $tLname, $point, $tPoint);
+					}
 				}
 
 				# 経験値
@@ -1957,6 +1962,12 @@ sub logMsWaste {
 sub logMsNormal {
 	my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
 	logOut("${HtagName_}${name}島${H_tagName}が${HtagName_}${tName}島$point${H_tagName}地点に向けて${HtagComName_}${comName}${H_tagComName}を行い、${HtagName_}$tPoint${H_tagName}の<B>$tLname</B>に命中、一帯が壊滅しました。",$id, $tId);
+}
+
+# 通常ミサイル都市地形に命中
+sub logMsTown {
+	my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint, $tLv) = @_;
+	logOut("${HtagName_}${name}島${H_tagName}が${HtagName_}${tName}島$point${H_tagName}地点に向けて${HtagComName_}${comName}${H_tagComName}を行い、${HtagName_}$tPoint${H_tagName}の<B>$tLname</B>に命中。<B>${tLv}${HunitPop}</B>の犠牲者がでました。",$id, $tId);
 }
 
 # ミサイル難民到着
