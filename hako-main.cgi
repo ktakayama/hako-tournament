@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # ↑はサーバーに合わせて変更して下さい。
 # perl5用です。
 
@@ -11,7 +11,10 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # メインスクリプト
-# $Id: hako-main.cgi,v 1.2 2003/07/02 02:45:27 gaba Exp $
+# $Id: hako-main.cgi,v 1.3 2004/11/03 11:01:20 gaba Exp $
+
+# エラーチェック用
+#use CGI::Carp qw(fatalsToBrowser);
 
 # 設定ファイル読み込み
 require ('hako-ini.cgi');
@@ -323,6 +326,11 @@ if($HmainMode eq 'turn') {
 	require('hako-help.cgi');
 	helpPageMain();
 
+} elsif($HmainMode eq 'chartView') {
+	# トーナメント表モード
+	require('hako-chart.cgi');
+	chartPageMain();
+
 } elsif($HmainMode eq 'expView') {
 	# expモード
 	require('hako-help.cgi');
@@ -400,6 +408,8 @@ sub readIslandsFile {
 	$HislandChangeTurn	= int(<IN>);  # 切り替えターン
 	$HislandFightCount	= int(<IN>);  # 何回戦目か
 	$HislandTurnCount	= int(<IN>);  # ターン更新数
+	$HislandChart		= <IN>;       # トーナメント表
+	chomp($HislandChart);
 
 	# ターン処理判定
 	my($now) = time;
@@ -553,6 +563,7 @@ sub writeIslandsFile {
 	print OUT "$HislandChangeTurn\n";
 	print OUT "$HislandFightCount\n";
 	print OUT "$HislandTurnCount\n";
+	print OUT "$HislandChart\n";
 
 	# 島の書きこみ
 	my($i);
@@ -841,6 +852,8 @@ sub cgiInput {
 		$Hlogturn = ($1 > $HlogMax) ? $HlogMax : $1;
 	} elsif($getLine =~ /help/) {
 		$HmainMode = 'helpView';
+	} elsif($getLine =~ /chart/) {
+		$HmainMode = 'chartView';
 	} elsif($getLine =~ /exp/) {
 		$HmainMode = 'expView';
 	} elsif($getLine =~ /LoseMap=([0-9]*)/) {

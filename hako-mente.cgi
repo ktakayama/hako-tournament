@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # ↑はサーバーに合わせて変更して下さい。
 
 #----------------------------------------------------------------------
@@ -10,7 +10,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # メンテナンスツール
-# $Id: hako-mente.cgi,v 1.1 2003/05/15 02:08:55 gaba Exp $
+# $Id: hako-mente.cgi,v 1.2 2004/11/03 11:01:20 gaba Exp $
 
 require ('hako-ini.cgi');
 
@@ -122,6 +122,7 @@ sub newMode {
 	print OUT ($HyosenTurn+$HdevelopeTurn)."\n";		 # 切り替えターン
 	print OUT "1\n";		 # 何回戦目か
 	print OUT "1\n";		 # ターン更新数
+	print OUT "\n";		 # トーナメント表
 
 	# ファイルを閉じる
 	close(OUT);

@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # トップモジュール
-# $Id: hako-top.cgi,v 1.2 2004/02/18 04:42:31 gaba Exp $
+# $Id: hako-top.cgi,v 1.3 2004/11/03 11:01:20 gaba Exp $
 
 #----------------------------------------------------------------------
 # トップページモード
@@ -104,6 +104,11 @@ END
 		$cgicheck = 'checked';
 	}
 
+    my $add;
+    if($Htournament == 1) {
+       $add = "　<a href='$HthisFile?chart=1' target=_blank STYlE='text-decoration:none'>".
+       "${HtagHeader_}トーナメント表${H_tagHeader}</a>";
+    }
 	# フォーム
 	out(<<END);
 <SCRIPT language="JavaScript">
@@ -145,6 +150,8 @@ $HislandList
 <A HREF="$HthisFile?LogFileView=1" target=_blank STYlE="text-decoration:none">${HtagHeader_}最近の出来事${H_tagHeader}</A>
 <BR><BR><BR>
 <A HREF="$HthisFile?FightLog=0" target=_blank STYlE="text-decoration:none">${HtagHeader_}対戦の記録${H_tagHeader}</A>
+$add
+<BR><BR><BR>
 </TD>
 </TR></TABLE>
 <HR>

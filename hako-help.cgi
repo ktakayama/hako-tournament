@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ヘルプモジュール
-# $Id: hako-help.cgi,v 1.1 2003/05/15 02:08:55 gaba Exp $
+# $Id: hako-help.cgi,v 1.2 2004/11/03 11:01:20 gaba Exp $
 
 #----------------------------------------------------------------------
 # ヘルプページモード
@@ -37,6 +37,38 @@ sub tempHelpPage {
 	$hide_mis = ($Hhide_missile)  ? "森に偽装" : "見える";
 	$hide_def = ($Hhide_deffence) ? "森に偽装" : "見える";
 
+	# 報酬金設定を表示
+    my $price;
+	if($HrewardMode == 1) {
+		$price = "(双方のミサイル基地の数 ＋ 双方の防衛施設の数 × 2) ÷ ".
+					"2 × 自分の戦闘行為回数 × 15 ＋ 荒地(ミサイル跡のみ) × ".
+                    "$HcomCost[$HcomPrepare2] ".$HunitMoney;
+	} elsif($HrewardMode == 2) {
+		$price = "破壊された農場・工場・ミサイル基地・防衛施設の建設費 ＋ 荒地(ミサイル跡のみ) × ".
+           "$HcomCost[$HcomPrepare2] ".$HunitMoney;
+	} else {
+		$price = "<FONT COLOR=RED>報酬金設定が正しくありません</FONT>";
+	}
+
+    # 対戦相手決定方式
+    my $battle;
+    if($Htournament == 1) {
+       $battle = "トーナメント表に従う";
+    } else {
+       $battle = "デフォルト設定";
+    }
+
+    # 特殊設定
+	my $mStr;
+	if($HeasyReclaim) {
+		$mStr .= "<H3>${HtagTH_}☆埋め立ての簡易化${H_tagTH}</H3>\n";
+		$mStr .= "→ 通常、海を埋め立てると浅瀬になりますが、その行程を飛ばして荒地になります。<BR>\n";
+		$mStr .= "つまり、陸地に面してる海なら、一回で荒地になります。<BR>\n";
+		$mStr .= "入り組んだ島を作るのが容易になりますが、その分村が生え難くもなりますので、<BR>\n";
+		$mStr .= "ほどほどに入り組ませましょう。<BR><BR>\n";
+		$mStr .= "通常通り浅瀬も発生しますが、性能は同じですので特に気にする必要はありません。<BR>\n";
+	}
+	$mStr = "<B>なし</B><BR>" if(!$mStr);
 
 	out(<<END);
 ${HtagTitle_}設定一覧${H_tagTitle}
@@ -45,29 +77,12 @@ ${HtagTitle_}設定一覧${H_tagTitle}
 <BR>
 <H1>${HtagHeader_}報酬金設定${H_tagHeader}</H1>
 <B>
-END
-	# 報酬金設定を表示
-	if($HrewardMode == 1) {
-		out("(双方のミサイル基地の数 ＋ 双方の防衛施設の数 × 2) ÷ ".
-					"2 × 自分の戦闘行為回数 × 15 ＋ 荒地(ミサイル跡のみ) × $HcomCost[$HcomPrepare2] ".$HunitMoney);
-	} elsif($HrewardMode == 2) {
-		out("破壊された農場・工場・ミサイル基地・防衛施設の建設費 ＋ 荒地(ミサイル跡のみ) × $HcomCost[$HcomPrepare2] ".$HunitMoney);
-	} else {
-		out("<FONT COLOR=RED>報酬金設定が正しくありません</FONT>");
-	}
-
-	my ($mStr,$cnt);
-	if($HeasyReclaim) {
-		$mStr .= "<H3>${HtagTH_}☆埋め立ての簡易化${H_tagTH}</H3>\n";
-		$mStr .= "→ 通常、海を埋め立てると浅瀬になりますが、その行程を飛ばして荒地になります。<BR>\n";
-		$mStr .= "つまり、陸地に面してる海なら、一回で荒地になります。<BR>\n";
-		$mStr .= "入り組んだ島を作るのが容易になりますが、その分村が生え難くもなりますので、<BR>\n";
-		$mStr .= "ほどほどに入り組ませましょう。<BR><BR>\n";
-		$mStr .= "通常通り浅瀬も発生しますが、性能は同じですので特に気にする必要はありません。<BR>\n";
-		$cnt = 1;
-	}
-	$mStr = "<B>なし</B><BR>" if(!$cnt);
-	out(<<END);
+$price
+</B><BR>
+<BR><HR>
+<H1>${HtagHeader_}対戦相手決定方式${H_tagHeader}</H1>
+<B>
+$battle
 </B><BR>
 <BR><HR>
 <H1>${HtagHeader_}特殊設定${H_tagHeader}</H1>
@@ -140,6 +155,7 @@ END
 	out(<<END);
 <BR><HR>
 <H1>${HtagHeader_}ターン進行行程 早見表${H_tagHeader}</H1>
+※この表が誤っている可能性が少しばかりあるので、参考程度に留めて下さい。
 <table height=125 border $HbgNameCell>
 <TR>
 <td>${HtagName_}予選${H_tagName}</td>
@@ -156,7 +172,6 @@ END
 		my $kaisen = ($i*2 > $HfightMem) ? "決勝" : "第$fitNum回";
 		# ターン行程の日程表示用
 		if(!$Htime_mode and !$v_mode and $HislandTurn + 1 >= $HyosenTurn and $HislandTurn + 1 <= $fitone) {
-			#$v_time = (($fitone - $HislandTurn) / $HdeveRepCount - $HdeveRepCount) * $HdevelopeTime + $HislandLastTime + $HunitTime;
 			$v_time = (($fitone - $HislandTurn) / $HdeveRepCount) * $HdevelopeTime + $HislandLastTime;
 			my($sec,$min,$hour,$mday,$mon) = get_time($v_time);
 			$v_text = "　〜　".$mon."月".$mday."日".$hour."時".$min."分";
@@ -227,9 +242,11 @@ sub tempexpPage {
 	# 報酬金設定
 	if($HrewardMode == 1) {
 		$reward_msg = "(双方のミサイル基地の数 ＋ 双方の防衛施設の数 × 2) ÷ ".
-					"2 × 自分の戦闘行為回数<SMALL>*</SMALL> × 15 ＋ 荒地(ミサイル跡のみ) × $HcomCost[$HcomPrepare2] ".$HunitMoney;
+					"2 × 自分の戦闘行為回数<SMALL>*</SMALL> × 15 ＋ 荒地(ミサイル跡のみ) × ".
+                    "$HcomCost[$HcomPrepare2] ".$HunitMoney;
 	} elsif($HrewardMode == 2) {
-		$reward_msg = "破壊された農場・工場・ミサイル基地・防衛施設の建設費 ＋ 荒地(ミサイル跡のみ) × $HcomCost[$HcomPrepare2] ".$HunitMoney;
+		$reward_msg = "破壊された農場・工場・ミサイル基地・防衛施設の建設費 ＋ 荒地(ミサイル跡のみ) × ".
+        "$HcomCost[$HcomPrepare2] ".$HunitMoney;
 	} else {
 		$reward_msg = "<FONT COLOR=RED>報酬金設定が正しくありません</FONT>";
 	}
@@ -337,13 +354,28 @@ $reward_msg
 <BR><BR>
 <h2>■対戦相手決定方式</h2>
 ちょっと複雑ですが、対戦相手の決定方法です。<BR><BR>
+END
+   if($Htournament == 1) {
+      out(<<END);
+まず、予選期間終了と同時に島別に<b>「島力」</b>を割り出します。<BR>
+島力は以下の計算式に基づいて割り出されます。<BR><BR>
+250 × (人口 + 農場 + 工場 + 採掘場規模) + 面積 × 700 + 軍事施設数 × 1000 + 推定資金 + 木の本数 × $HtreeValue - 荒地 × $HcomCost[$HcomPrepare2]<BR><BR>
+次に0〜割り出された数値の間で数字を一つ、ランダムに取り出します。<BR>
+仮に島力が5000の場合、最終的な島力は、0〜5000の間のどれかとなるわけです。<BR><BR>
+この最終的に割り出された島力を、上位から並べて行き、上から順番にトーナメント表に割り振っていきます。
+END
+   } else {
+      out(<<END);
 まず、戦闘(予選)期間終了と同時に島別に<b>「島力」</b>を割り出します。<BR>
 島力は以下の計算式に基づいて割り出されます。<BR><BR>
 250 × (人口 + 農場 + 工場 + 採掘場規模) + 面積 × 700 + 軍事施設数 × 1000 + 推定資金 + 木の本数 × $HtreeValue - 荒地 × $HcomCost[$HcomPrepare2]<BR><BR>
 次に0〜割り出された数値の間で数字を一つ、ランダムに取り出します。<BR>
 仮に島力が5000の場合、最終的な島力は、0〜5000の間のどれかとなるわけです。<BR><BR>
 この最終的に割り出された島力を、上位から並べて行き、上から順番に対戦相手としていきます。
+END
+   }
 
+   out(<<END);
 <BR><BR><BR>
 <h2>■廃止・変更・新コマンド一覧</h2>
 <B>以下のコマンドは使用出来ません。</b><BR>

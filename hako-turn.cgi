@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ターン進行モジュール
-# $Id: hako-turn.cgi,v 1.3 2004/04/27 02:41:23 gaba Exp $
+# $Id: hako-turn.cgi,v 1.4 2004/11/03 11:01:20 gaba Exp $
 
 # 周囲2ヘックスの座標
 my(@ax) = (0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
@@ -139,6 +139,7 @@ sub makeNewIsland {
 
 # 簡易重複チェック
 sub registCheck {
+	return 0 if($Hdebug == 1);
     my($ip) = $ENV{'HTTP_X_FORWARDED_FOR'};
     $ip = $ENV{'REMOTE_ADDR'} if(!$ip);
 
@@ -296,7 +297,7 @@ sub changeMain {
 	if($HcurrentName ne '') {
 		# 名前変更の場合		
 		# 名前が正当かチェック
-		if($HcurrentName =~ /[,\?\(\)\<\>]|^無人$/) {
+		if($HcurrentName =~ /[,\"\?\(\)\<\>]|^無人$/) {
 			# 使えない名前
 			unlock();
 			tempNewIslandBadName();
@@ -327,6 +328,11 @@ sub changeMain {
 		logChangeName($island->{'name'}, $HcurrentName);
 		$island->{'name'} = $HcurrentName;
 		$flag = 1;
+
+        if($Htournament == 1) {
+           require('hako-chart.cgi');
+           makeChartPage();
+        }
 	}
 
 	# password変更の場合
@@ -538,6 +544,7 @@ sub turnMain {
 			my $tIsland = $Hislands[$HcurrentNumber];
 			if($winlose == 1) {
 				# 戦闘後の勝敗・報酬金
+                my $id = $island->{'id'};
 				if(($HcurrentNumber ne '' and $island->{'pop'} >= $tIsland->{'pop'}) or ($island->{'fight_id'} == -1)) {
 					# 勝ち
 
@@ -565,10 +572,13 @@ sub turnMain {
 
 					$island->{'log'}	 = 0;
 					$island->{'fight_id'} = 0;
+                    $HislandChart =~ s/[0-9]+,$id,[^"]+"/$HislandFightCount,$id,$island->{'name'}島"/;
 				} elsif($HcurrentNumber ne '' and $island->{'pop'} < $tIsland->{'pop'}) {
-#					$island->{'pop'} = 0;
+                   #$island->{'pop'} = 0;
 					logLose($island->{'id'}, $island->{'name'});
 					save_lose_island($island);
+                    my $turn = $HislandFightCount - 1;
+                    $HislandChart =~ s/[0-9]+,$id,[^"]+"/$turn,$id,$island->{'name'}島"/;
 				}
 				$island->{'reward'}	 = 0;
 				$island->{'fly'}	 = 0;
@@ -615,29 +625,69 @@ sub turnMain {
 
 	# 対戦相手決定
 	if($fight_check == 1) {
-		# 島力計算
-		for($i = 0; $i < $HislandNumber; $i++) {
-			doIslandPower($Hislands[$i]);
-		}
+       if($Htournament == 1) {
+          undef %HidToNumber;
+          # HidToNumber の作成 (すぐ上で islandSort してるので)
+          for($i = 0; $i < $HislandNumber; $i++) {
+             my $island = $Hislands[$i];
+             $HidToNumber{$Hislands[$i]->{'id'}} = $i;
+          }
+       }
 
-		# 島力順にソート
-		islandPowerSort();
+       if($Htournament == 1 and $HislandChart) {
+          # トーナメント表形式
 
-		# 対戦相手決定
-		for($i = 0; $i < $HislandNumber; $i++) {
-			$island = $HislandPower[$i];
-			next if($island->{'fight_id'} > 0);
+          # 上から順番に割り振り
+          my $chart  = $HislandChart;
+          while($chart =~ s/$HislandFightCount,([0-9]+),//) {
+             my $num = $HidToNumber{$1};
+             my $island  = $Hislands[$num];
 
-			if($i + 1 == $HislandNumber) {
-				# 不戦勝 開発停止
-				$island->{'fight_id'} = -1;
-				$island->{'rest'}	  += $HnofightTurn + $HislandFightCount * $HnofightUp;
-			} else {
-				$tIsland = $HislandPower[$i+1];
-				$island->{'fight_id'} = $tIsland->{'id'};
-				$tIsland->{'fight_id'} = $island->{'id'};
-			}
-		}
+             if($chart =~ s/$HislandFightCount,([0-9]+),//) {
+                my $num2 = $HidToNumber{$1};
+                my $tIsland = $Hislands[$num2];
+                $island->{'fight_id'}  = $tIsland->{'id'};
+                $tIsland->{'fight_id'} = $island->{'id'};
+             } else {
+                # 不戦勝
+                $island->{'fight_id'} = -1;
+                $island->{'rest'}    += $HnofightTurn + $HislandFightCount * $HnofightUp;
+             }
+          }
+       } else {
+          # 島力順
+
+          # 島力計算
+          for($i = 0; $i < $HislandNumber; $i++) {
+             doIslandPower($Hislands[$i]);
+          }
+
+          # 島力順にソート
+          islandPowerSort();
+
+          # 対戦相手決定
+          for($i = 0; $i < $HislandNumber; $i++) {
+             $island = $HislandPower[$i];
+             next if($island->{'fight_id'} > 0);
+
+             if($i + 1 == $HislandNumber) {
+                # 不戦勝 開発停止
+                $island->{'fight_id'} = -1;
+                $island->{'rest'}	  += $HnofightTurn + $HislandFightCount * $HnofightUp;
+                $HislandChart .= "0,$island->{'id'},$island->{'name'}島\"0,-\"";
+             } else {
+                $tIsland = $HislandPower[$i+1];
+                $island->{'fight_id'} = $tIsland->{'id'};
+                $tIsland->{'fight_id'} = $island->{'id'};
+                $HislandChart .= "0,$island->{'id'},$island->{'name'}島\"0,$tIsland->{'id'},$tIsland->{'name'}島\"";
+             }
+          }
+       }
+
+       if($Htournament == 1) {
+          require('hako-chart.cgi');
+          makeChartPage();
+       }
 	}
 
 	# 対戦の記録バックアップ用
@@ -2010,7 +2060,7 @@ END
 # 新規で名前が不正な場合
 sub tempNewIslandBadName {
 	out(<<END);
-${HtagBig_}',?()<>\$'とか入ってたり、「無人島」とかいった変な名前はやめましょうよ〜${H_tagBig}$HtempBack
+${HtagBig_}',"?()<>\$'とか入ってたり、「無人島」とかいった変な名前はやめましょうよ〜${H_tagBig}$HtempBack
 END
 }
 
