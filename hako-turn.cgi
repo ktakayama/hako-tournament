@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ターン進行モジュール
-# $Id: hako-turn.cgi,v 1.2 2004/02/18 04:42:31 gaba Exp $
+# $Id: hako-turn.cgi,v 1.3 2004/04/27 02:41:23 gaba Exp $
 
 # 周囲2ヘックスの座標
 my(@ax) = (0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
@@ -1767,7 +1767,7 @@ sub logWin {
 	my $fTurn = $HislandFightCount + 1;
 	if($HislandNumber == 4) {
 		$fTurn = '決勝戦';
-	} elsif($HteamNumber == 8) { 
+	} elsif($HislandNumber == 8) { 
 		$fTurn = '準決勝';
 	} else {
 		$fTurn .= '回戦';

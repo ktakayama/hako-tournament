@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # 地図モードモジュール
-# $Id: hako-map.cgi,v 1.3 2004/02/18 04:42:31 gaba Exp $
+# $Id: hako-map.cgi,v 1.4 2004/04/27 02:41:23 gaba Exp $
 
 #----------------------------------------------------------------------
 # 観光モード
@@ -622,11 +622,11 @@ sub landString {
 	if($j_mode) {
 		if($mode == 1) {
 			out(qq#<A HREF="JavaScript:void(0);" onclick="ps($x,$y)" #);
-			out(qq#onMouseOver="set_com($x, $y, '$point $alt'); return true;" onMouseOut="status = '';">#);
+			out(qq#onMouseOver="set_com($x, $y, '$point $alt'); return true;" onMouseOut="window.status = '';">#);
 			$comStr = '';
 		} else {
 			out(qq#<A HREF="JavaScript:void(0);" onclick="ps($x,$y)" #);
-			out(qq#onMouseOver="status = '$point $alt $comStr'; return true;" onMouseOut="status = '';">#);
+			out(qq#onMouseOver="window.status='$point $alt $comStr'; return true;" onMouseOut="window.status = '';">#);
 		}
 	} elsif($mode == 1) {
 		out("<A HREF=\"JavaScript:void(0);\" onclick=\"ps($x,$y)\" onMouseOver=\"ShowMsg('$point $alt $comStr'); return true;\">");
@@ -663,7 +663,7 @@ END
 <SCRIPT Language="JavaScript">
 <!--
 function ShowMsg(n){
-		status = n;
+		window.status = n;
 }
 //-->
 </SCRIPT>
@@ -692,7 +692,7 @@ function ns(x) {
 	return true;
 }
 function ShowMsg(n){
-		status = n;
+		window.status = n;
 		document.forms[0].COMSTATUS.value= n;
 }
 //-->
@@ -1081,7 +1081,7 @@ function ns(x) {
 }
 
 function ShowMsg(n){
-	status = n;
+	window.status = n;
 }
 //-->
 </SCRIPT>

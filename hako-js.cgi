@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # JS開発画面モジュール
-# $Id: hako-js.cgi,v 1.2 2004/02/18 04:42:31 gaba Exp $
+# $Id: hako-js.cgi,v 1.3 2004/04/27 02:41:23 gaba Exp $
 
 #----------------------------------------------------------------------
 # Ｊａｖａスクリプト開発画面
@@ -17,7 +17,6 @@ sub tempOwnerJava {
 
 	$HcurrentNumber = $HidToNumber{$HcurrentID};
 	my($island) = $Hislands[$HcurrentNumber];
-	my($team) = $Hteams[$HidToTeamNumber{$island->{'teamid'}}];
 	# コマンドセット
 	$set_com = "";
 	$com_max = "";
@@ -320,7 +319,7 @@ function set_com(x, y, land) {
 			com_str += " ";
 		}
 	}
-	status = com_str;
+	window.status = com_str;
 	document.myForm.COMSTATUS.value= com_str;
 }
 
@@ -724,7 +723,7 @@ function cominput(kind) {
 }
 
 function ShowMsg(n){
-	status = n;
+	window.status = n;
 }
 //-->
 </SCRIPT>
