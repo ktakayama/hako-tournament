@@ -69,7 +69,7 @@ $HlbbsView		= 5;		# ローカル掲示板、通常観光画面で表示する行数（HlbbsMaxより小さ
 $Htop_blank		= 0;		# トップから島名クリックで新しい画面で表示(0:同じ画面　1:新しい画面)
 $cryptOn		= 1;		# パスワードの暗号化(1だと暗号化する)
 $Hdebug			= 0;		# デバッグモード(1だと、「ターンを進める」ボタンが使用できる)
-$Hmobile		= 0;		# 携帯端末画面テスト用（準備中）
+$Hmobile		= 0;		# 携帯画面テスト用(1だと、強制的に携帯用の画面表示)
 $Htime_mode		= 0;		# 次回更新までの日時が表示されない場合はここを1にして下さい
 $Hmissile_log	= 0;		# ミサイル発射のログを簡略化表示する（0:しない 1:設定する）
 
@@ -273,15 +273,13 @@ sub tempHeader {
 	}
 	$baseIMG =~ s/筑集眺餅/デスクトップ/g;
 
-	out(<<END);
-Content-type: text/html
+	out("Content-type: text/html\n\n");
 
-
+	if($Hmobile == 0) {
+		out(<<END);
 <HTML>
 <HEAD>
-<TITLE>
-$Htitle
-</TITLE>
+<TITLE>$Htitle</TITLE>
 <BASE HREF="$baseIMG/">
 </HEAD>
 $Body
@@ -299,14 +297,26 @@ $Body
 </nobr>
 <HR>
 END
-	if($HimgFlag) {
-		out("<FONT COLOR=RED>サーバー負荷軽減の為に、画像のローカル設定を行って下さるようにお願い致します。</FONT><HR>");
-	}
+		if($HimgFlag) {
+			out("<FONT COLOR=RED>サーバー負荷軽減の為に、画像のローカル設定を行って下さるようにお願い致します。</FONT><HR>");
+		}
+	} else {
+       out(<<END);
+<HTML>
+<HEAD>
+<TITLE>$Htitle</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+<a href="./hako-main.cgi">トップ</a> <a href="./hako-main.cgi?help=1">ヘルプ</a> <a href="./hako-main.cgi?exp=1">リンク</a>
+<hr>
+END
+    }
 }
 
 # フッタ
 sub tempFooter {
-	out(<<END);
+	if($Hmobile == 0) {
+		out(<<END);
 <HR>
 <P align=right>
 <NOBR>
@@ -317,6 +327,10 @@ sub tempFooter {
 </nobr><BR><BR>
 管理者:$adminName(<A HREF="mailto:$email">$email</A>)<BR>
 </P>
+END
+	}
+	out(<<END);
+<hr>
 </BODY>
 </HTML>
 END

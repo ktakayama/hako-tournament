@@ -106,9 +106,24 @@ sub commandMain {
 		return;
 	}
 
-	# モードで分岐
+	commandAdd($island);
+
+	# owner modeへ
+	ownerMain();
+
+}
+
+# コマンド登録
+sub commandAdd {
+	my $island = shift;
 	my($command) = $island->{'command'};
 
+	$HcommandKind =~ tr/0-9//dc;
+	$HcommandArg  =~ tr/0-9//dc;
+	$HcommandX    =~ tr/0-9//dc;
+	$HcommandY    =~ tr/0-9//dc;
+
+	# モードで分岐
 	if($HcommandMode eq 'delete') {
 		slideFront($command, $HcommandPlanNumber);
 		tempCommandDelete();
@@ -192,10 +207,6 @@ sub commandMain {
 
 	# データの書き出し
 	writeIslandsFile($HcurrentID);
-
-	# owner modeへ
-	ownerMain();
-
 }
 
 #----------------------------------------------------------------------
@@ -1007,11 +1018,7 @@ sub tempCommand {
 	} elsif($kind == $HcomSell) {
 		# 食料輸出
 		out("$name$value");
-	} elsif($kind == $HcomDestroy) {
-		# 掘削
-		out("$pointで$name");
-	} elsif(($kind == $HcomFarm) || ($kind == $HcomFactory) ||
-			 ($kind == $HcomMountain)) {
+	} elsif(($kind == $HcomFarm) || ($kind == $HcomFactory) || ($kind == $HcomMountain)) {
 		# 回数付き
 		if($arg == 0) {
 			out("$pointで$name");
@@ -1285,7 +1292,7 @@ ${HtagBig_}記帳内容を削除しました${H_tagBig}<HR>
 END
 }
 
-# コマンド登録
+# コメント登録
 sub tempLbbsAdd {
 	out(<<END);
 ${HtagBig_}記帳を行いました${H_tagBig}<HR>

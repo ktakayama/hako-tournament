@@ -11,7 +11,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # メインスクリプト
-# $Id: hako-main.cgi,v 1.6 2004/11/10 13:45:13 gaba Exp $
+# $Id$
 
 # エラーチェック用
 #use CGI::Carp qw(fatalsToBrowser);
@@ -163,13 +163,16 @@ if($Hdebug == 1) {
 # jcode.plをrequire
 require($jcode);
 
-# my $agent=$ENV{'HTTP_USER_AGENT'};
-# require('hako-imode.cgi') if($agent=~/DoCoMo/ or $mobile);
-
 # 「戻る」リンク
 $HtempBack = "<A HREF=\"$HthisFile\">${HtagBig_}トップへ戻る${H_tagBig}</A>";
 
 $Body = "<BODY $htmlBody>";
+
+my $agent=$ENV{'HTTP_USER_AGENT'};
+if($agent =~ /(DoCoMo|J-PHONE|UP\.Browser|DDIPOCKET|ASTEL|PDXGW)/i) {
+   # 携帯端末
+   $Hmobile = 1;
+}
 
 mente_mode() if(-e "./mente_lock");
 
@@ -204,6 +207,11 @@ if(readIslandsFile($HcurrentID) == 0) {
 	tempHeader();
 	tempNoDataFile();
 	tempFooter();
+	exit(0);
+}
+
+if($Hmobile) {
+	require('hako-mobile.cgi');
 	exit(0);
 }
 
@@ -916,6 +924,8 @@ sub cgiInput {
 		$HdefaultY = $1;
 		$line =~ /COMMANDMODE=(write|insert|delete)/;
 		$HcommandMode = $1;
+	} elsif($line =~ /Mobile([0-9]*)/) {
+		$HmainMode = $1;
 	} else {
 		$HmainMode = 'top';
 	}
@@ -1288,7 +1298,10 @@ sub logFilePrint {
 		next if($id and $id2 and $id != $id2 and $Hmissile_log);
 
 		# 表示
-		if($kankou == 1) {
+        if($kankou == 2) {
+           $message =~ s/<[^>]*>//g;
+			out("[$turn] $m $message<BR>\n");
+        } elsif($kankou == 1) {
 			out("<NOBR>${HtagNumber_}ターン$turn$m${H_tagNumber}：$message</NOBR><BR>\n");
 		} elsif(($fi == 0) && ($mode == 0)) {
 			out("<NOBR><BR><B><I><FONT COLOR='#000000' SIZE=+2>ターン$turn$m：</FONT></I></B><BR><HR width=50% align=left>\n");
