@@ -11,7 +11,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # メインスクリプト
-# $Id: hako-main.cgi,v 1.4 2004/11/06 02:28:45 gaba Exp $
+# $Id: hako-main.cgi,v 1.5 2004/11/10 13:01:25 gaba Exp $
 
 # エラーチェック用
 #use CGI::Carp qw(fatalsToBrowser);
@@ -746,7 +746,7 @@ sub cgiInput {
 	# 入力を受け取って日本語コードをEUCに
 	$line = <>;
 	$line =~ tr/+/ /;
-	$line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+    $line =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack('H2', $1)/eg;
 	$line = jcode::euc($line);
 	$line =~ s/[\x00-\x1f\,]//g;
 
