@@ -1,6 +1,6 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 
-　箱庭トーナメント２ readme -2004/06/03更新-
+　箱庭トーナメント２ readme -2004/11/06更新-
 　　By　Kyosuke Takayama (ドン・ガバチョ) support@mc.neweb.ne.jp
 　　　配布サイト　(http://espion.just-size.jp/archives/dist_hako/)
 
@@ -111,8 +111,8 @@
 　flock方式がうまく動かない場合は、こちらを使用して下さい。
 
 　・デバッグモード
-　デバッグモードで動作させる場合は、$HdeveRepCountと$HfightRepCountの
-　値が自動的に1になります。
+　デバッグモードで動作させる場合は、$HdeveRepCount、$HdeveRepCount、
+　$HfightRepCountの値が自動的に1になります。
 　これは、ターンをまとめて更新する処理が少し特殊なため、
 　デバッグ中は、1ターンずつ更新させるようにした方がいいと判断したためです。
 

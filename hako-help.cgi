@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ヘルプモジュール
-# $Id: hako-help.cgi,v 1.2 2004/11/03 11:01:20 gaba Exp $
+# $Id: hako-help.cgi,v 1.3 2004/11/06 02:28:45 gaba Exp $
 
 #----------------------------------------------------------------------
 # ヘルプページモード
@@ -19,7 +19,7 @@ sub helpPageMain {
 sub tempHelpPage {
 
 	# データの表示用設定
-	my($devrep,$firep);
+	my($yosrep,$devrep,$firep);
 	my($unit) = $HunitTime / 3600;
 	my($deve) = $HdevelopeTime / 3600;
 	my($fiunit) = $HfightTime / 3600;
@@ -27,6 +27,7 @@ sub tempHelpPage {
 	$HdisFalldown /= 10;
 	$HdisFallBorder++;
 
+	$yosrep = '（' . $HyosenRepCount . 'ターンまとめて更新）' if($HyosenRepCount > 1);
 	$devrep = '（' . $HdeveRepCount . 'ターンまとめて更新）' if($HdeveRepCount > 1);
 	$firep  = '（' . $HfightRepCount . 'ターンまとめて更新）' if($HfightRepCount > 1);
 
@@ -124,7 +125,7 @@ $battle
 <H1>${HtagHeader_}ターン進行ヘルプ${H_tagHeader}</H1>
 <table width=300 border $HbgNameCell>
 <TR><TD colspan=2 $HbgTitleCell>${HtagTH_}ターン更新時間${H_tagTH}</TD></TR>
-<TR><TD><NOBR>　${HtagName_}予選期間${H_tagName}</NOBR></TD><TD NOWRAP><B>$unit時間</b>　${devrep}</TD></TR>
+<TR><TD><NOBR>　${HtagName_}予選期間${H_tagName}</NOBR></TD><TD NOWRAP><B>$unit時間</b>　${yosrep}</TD></TR>
 <TR><td WIDTH=100><NOBR>　${HtagName_}開発期間${H_tagName}</NOBR></TD><TD NOWRAP><B>$deve時間</b>　${devrep}</TD></TR>
 <TR><TD><NOBR>　${HtagName_}戦闘期間${H_tagName}</NOBR></TD><TD NOWRAP><B>$fiunit時間</b>　${firep}</TD></TR>
 <TR><TD><NOBR>　${HtagName_}戦闘から開発移行${H_tagName}</NOBR></TD><TD NOWRAP><B>$inter時間後</b></TD></TR>
@@ -146,7 +147,7 @@ END
 
 	# ターン行程の日程表示用
 	if(!$Htime_mode and $HislandTurn < $HyosenTurn) {
-		$v_time = (($HyosenTurn - $HislandTurn) / $HdeveRepCount - 1) * $HunitTime + $HislandLastTime + $HunitTime;
+		$v_time = (($HyosenTurn - $HislandTurn) / $HyosenRepCount - 1) * $HunitTime + $HislandLastTime + $HunitTime;
 		my($sec,$min,$hour,$mday,$mon) = get_time($v_time);
 		$v_text = "　〜　".$mon."月".$mday."日".$hour."時".$min."分";
 		$v_mode = 1;
@@ -164,9 +165,8 @@ END
 </tr>
 END
 
-	$v_yosenTime = ($HyosenTurn / $HdeveRepCount) * $HunitTime;
 	$HyosenTurn++;
-	$v_time += $HdevelopeTime;
+	$v_time += $HunitTime;
 
 	for($i = 2;$i <= $HfightMem;$i*=2) {
 		my $kaisen = ($i*2 > $HfightMem) ? "決勝" : "第$fitNum回";

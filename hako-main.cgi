@@ -11,7 +11,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # メインスクリプト
-# $Id: hako-main.cgi,v 1.3 2004/11/03 11:01:20 gaba Exp $
+# $Id: hako-main.cgi,v 1.4 2004/11/06 02:28:45 gaba Exp $
 
 # エラーチェック用
 #use CGI::Carp qw(fatalsToBrowser);
@@ -151,6 +151,7 @@ $HpointNumber = $HislandSize * $HislandSize;
 
 # デバックモード中は、ターンのまとめ更新はしない
 if($Hdebug == 1) {
+	$HyosenRepCount	= 1;
 	$HdeveRepCount	= 1;
 	$HfightRepCount	= 1;
 }

@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # ターン進行モジュール
-# $Id: hako-turn.cgi,v 1.4 2004/11/03 11:01:20 gaba Exp $
+# $Id: hako-turn.cgi,v 1.5 2004/11/06 02:28:45 gaba Exp $
 
 # 周囲2ヘックスの座標
 my(@ax) = (0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
@@ -380,7 +380,7 @@ sub turnMain {
 	}
 
 	# まとめ更新初期値
-	$HislandTurnCount = $HdeveRepCount if($HislandTurn == 0);
+	$HislandTurnCount = $HyosenRepCount if($HislandTurn == 0);
 
 	# 座標配列を作る
 	makeRandomPointArray();
@@ -428,10 +428,10 @@ sub turnMain {
 		# 開発期間終了時
 		$HislandLastTime += $HfightTime;
 		$HislandTurnCount = $HdeveRepCount;
-	} elsif($HislandTurn < $HyosenTurn) {
+	} elsif($HislandTurn <= $HyosenTurn) {
 		# 予選期間
 		$HislandLastTime += $HunitTime;
-		$HislandTurnCount = $HdeveRepCount if($HislandTurn != $HdeveRepCount);
+		$HislandTurnCount = $HyosenRepCount if($HislandTurn != $HyosenRepCount);
 	} else {
 		# 開発期間
 		$HislandLastTime += $HdevelopeTime;
