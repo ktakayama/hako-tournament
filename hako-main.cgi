@@ -1254,10 +1254,19 @@ sub random {
 sub get_time {
 	my $time = $_[0];
 	my($sec,$min,$hour,$mday,$mon) = localtime($time);
-	$mon  = "0".$mon if($mon++ < 9);
-	$mday = "0".$mday if($mday < 10);
-	$hour = "0".$hour if($hour < 10);
-	$min  = "0".$min if($min < 10);
+	$mon  = "0".$mon  if($mon++ < 9);
+	$mday = "0".$mday if($mday  < 10);
+	$hour = "0".$hour if($hour  < 10);
+	$min  = "0".$min  if($min   < 10);
+	if($_[1] == 1) {
+		return '' if($time == 1);
+		if($time + 60000 < time()) {
+			$date = sprintf("</b>%02d/%02d<b>", $mon,$mday);
+		} else {
+			$date = sprintf("<b>%02d:%02d</b>", $hour,$min);
+		}
+		return "(${date})";
+	}
 	return ($sec,$min,$hour,$mday,$mon);
 }
 

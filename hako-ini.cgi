@@ -20,6 +20,7 @@ $imageDir	= 'http://www.hako.com/img';
 $toppage 	= 'http://www.hako.com/';			# ホームページのアドレス
 $bbsname 	= '掲示板';							# 掲示板の名称
 $bbs		= 'http://www.hako.com/bbs/';		# 掲示板アドレス
+$bbsLog		= './bbs/log.dat';					# 掲示板のログファイル名
 $imageExp	= 'http://www.hako.com/imgexp/';	# 画像のローカル設定の説明ページ
 
 $jcode				= './jcode.pl';				# jcode.plの位置
@@ -276,6 +277,7 @@ sub tempHeader {
 	out("Content-type: text/html\n\n");
 
 	if($Hmobile == 0) {
+		my $bbTime = get_time((stat($bbsLog))[9], 1, 1);
 		out(<<END);
 <HTML>
 <HEAD>
@@ -284,11 +286,12 @@ sub tempHeader {
 </HEAD>
 $Body
 　<A HREF="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html">箱庭諸島スクリプト配布元</A>
- / <A HREF="http://appoh.execweb.cx/hakoniwa/" target=_blank>箱庭Javaスクリプト版 配布元 </A>
- / <A HREF="http://espion.just-size.jp/archives/dist_hako/" target=_blank>箱庭トーナメント２ 配布元 </A>
+ / <A HREF="http://appoh.execweb.cx/hakoniwa/" target=_blank>箱庭Javaスクリプト版 配布元</A>
+ / <A HREF="http://espion.just-size.jp/archives/dist_hako/" target=_blank>箱庭トーナメント２ 配布元</A>
+ / <A HREF="http://espion.just-size.jp/files/link/link.cgi" target=_blank>箱庭トーナメントリンク集</A>
 <B><BR>
 <A HREF="$toppage">トップページ</A>
- / <A HREF="$bbs">$bbsname</A>
+ / <A HREF="$bbs">$bbsname</A>$bbTime
  / <A HREF="$HthisFile?LogFileView=1" target=_blank>最近の出来事</A>
  / <A HREF="$HthisFile?help=1">設定一覧</A>
  / <A HREF="$HthisFile?exp=1" target=_blank>マニュアル</A>

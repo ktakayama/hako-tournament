@@ -573,14 +573,14 @@ sub MtempCommand {
 
 # 各種リンク
 sub MlinkPageMain {
+   my $bbTime = get_time((stat($bbsLog))[9], 1, 1);
    unlock();
+
    out(<<END);
 - <A HREF="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html">箱庭諸島スクリプト配布元</A><br>
-- <A HREF="http://appoh.execweb.cx/hakoniwa/">箱庭Javaスクリプト版 配布元 </A><br>
-- <A HREF="http://espion.just-size.jp/archives/dist_hako/">箱庭トーナメント２ 配布元 </A><br>
 <BR>
 - <A HREF="$toppage">ホーム</A><br>
-- <A HREF="$bbs">$bbsname</A><br>
+- <A HREF="$bbs">$bbsname</A>$bbTime<br>
 END
 }
 
