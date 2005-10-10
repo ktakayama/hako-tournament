@@ -312,7 +312,6 @@ if($HmainMode eq 'turn') {
 } elsif($HmainMode eq 'change') {
 	# 情報変更モード
 	require('hako-turn.cgi');
-	require('hako-top.cgi');
 	changeMain();
 
 } elsif($HmainMode eq 'FightView') {
@@ -794,6 +793,11 @@ sub cgiInput {
 
 	if($line =~ /JAVAMODE=(cgi|java)/) {
 		$HjavaMode = $1;
+	}
+
+	# 非同期通信フラグ
+	if($line =~ /async=true\&/) {
+		$Hasync = 1;
 	}
 
 	# メッセージ

@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 # 箱庭トーナメント２
 # JS開発画面モジュール
-# $Id: hako-js.cgi,v 1.4 2004/11/02 01:47:57 gaba Exp $
+# $Id$
 
 #----------------------------------------------------------------------
 # Ｊａｖａスクリプト開発画面
@@ -62,9 +62,9 @@ sub tempOwnerJava {
 		$l_name =~ s/'/\\'/g;
 		$l_id = $Hislands[$i]->{'id'};
 		if($i == $HislandNumber-1){
-			$set_island .= "\[$l_id\,\'$l_name\'\]\n";
+			$set_island .= "'$l_id'\:\'$l_name\'\n";
 		} else {
-			$set_island .= "\[$l_id\,\'$l_name\'\]\,\n";
+			$set_island .= "'$l_id'\:\'$l_name\'\,\n";
 		}
 	}
 
@@ -79,9 +79,7 @@ $HtempBack<BR>
 // ＪＡＶＡスクリプト開発画面配布元
 // あっぽー庵箱庭諸島（ http://appoh.execweb.cx/hakoniwa/ ）
 // Programmed by Jynichi Sakai(あっぽー)
-isIE4 = (navigator.appVersion.charAt(0)>=4 && (navigator.appVersion).indexOf("MSIE") != -1);
-isNN4 = (navigator.appVersion.charAt(0)>=4 && (navigator.appName).indexOf("Netscape")!=-1);
-isNN6 = (document.getElementById);
+var xmlhttp;
 
 var str;
 
@@ -96,8 +94,9 @@ $set_com];
 comlist = [
 $set_listcom];
 
-islname = [
-$set_island];
+islname = {
+$set_island
+};
 
 function init(){
 	for(i = 0; i < command.length ;i++) {
@@ -111,36 +110,55 @@ function init(){
 	str = plchg();
 	str = "<NOBR><font color=blue>−−−− <B>送信済み</B> −−−−</font></NOBR><br>"+str;
 	disp(str, "#ccffcc");
-    check_menu();
 
+    xmlhttp = new_http();
+
+    if(document.layers) {
+       document.captureEvents(Event.MOUSEMOVE | Event.MOUSEUP);
+    }
+    document.onmouseup   = Mup;
+    document.onmousemove = Mmove;
+    document.myForm.CommandJavaButton$island->{'id'}.disabled = true;
+    ns(0);
 }
 
-function cominput(x, k, z) {
+function cominput(x, k, z, f2) {
 	a = document.myForm.NUMBER.options[document.myForm.NUMBER.selectedIndex].value;
 	b = document.myForm.COMMAND.options[document.myForm.COMMAND.selectedIndex].value;
 	c = document.myForm.POINTX.options[document.myForm.POINTX.selectedIndex].value;
 	d = document.myForm.POINTY.options[document.myForm.POINTY.selectedIndex].value;
 	e = document.myForm.AMOUNT.options[document.myForm.AMOUNT.selectedIndex].value;
 	f = document.myForm.TARGETID.options[document.myForm.TARGETID.selectedIndex].value;
-	if(x == 6){ b = k; }
-	if(z) { f = z; }
-	if (x == 1 || x == 6)		{
-		for(i = $HcommandMax - 1; i > a; i--) {
-			command[i] = command[i-1];
+	if(f2) { f = f2; }
+
+	var newNs = a;
+	if (x == 1 || x == 2 || x == 6){
+		if(x == 6) b = k;
+		if(x != 2) {
+			for(i = $HcommandMax - 1; i > a; i--) {
+				command[i] = command[i-1];
 				g[i] = g[i-1];
+			}
 		}
+
+		var comlist2 = comlist;
+		for(i = 0; i < comlist2.length; i++){
+			if(comlist2[i][0] == b){
+				g[a] = comlist2[i][1];
+				break;
+			}
+		}
+		command[a] = [b,c,d,e,f];
+		newNs++;
+		menuclose();
 	} else if(x == 3) {
-		for(i = Math.floor(a); i < ($HcommandMax - 1); i++) {
+		var num = (k) ? k-1 : a;
+		for(i = Math.floor(num); i < ($HcommandMax - 1); i++) {
 			command[i] = command[i + 1];
 			g[i] = g[i+1];
 		}
 		command[$HcommandMax-1] = [41,0,0,0,0];
 		g[$HcommandMax-1] = '資金繰り';
-		str = plchg();
-		str = "<NOBR><font color=red><b>−−−−−未送信−−−−−</b></font></NOBR><br>"+str;
-		disp(str,"white");
-		outp();
-		return true;
 	} else if(x == 4) {
 		i = Math.floor(a)
 		if (i == 0){ return true; }
@@ -149,12 +167,7 @@ function cominput(x, k, z) {
 		command[i] = tmpcom2[i];command[i-1] = tmpcom1[i];
 		k1[i] = g[i];k2[i] = g[i - 1];
 		g[i] = k2[i];g[i-1] = k1[i];
-		ns(--i);
-		str = plchg();
-		str = "<NOBR><font color=red><b>−−−−−未送信−−−−−</b></font></NOBR><br>"+str;
-		disp(str,"white");
-		outp();
-		return true;
+		newNs = i-1;
 	} else if(x == 5) {
 		i = Math.floor(a)
 		if (i == $HcommandMax-1){ return true; }
@@ -162,28 +175,34 @@ function cominput(x, k, z) {
 		command[i] = tmpcom2[i];command[i+1] = tmpcom1[i];
 		k1[i] = g[i];k2[i] = g[i + 1];
 		g[i] = k2[i];g[i+1] = k1[i];
-		ns(++i);
-		str = plchg();
-		str = "<NOBR><font color=red><b>−−−−−未送信−−−−−</b></font></NOBR><br>"+str;
-		disp(str,"white");
-		outp();
-		return true;
-	}
-
-	for(i = 0;i < comlist.length; i++){
-		if(comlist[i][0] == b){
-			g[a] = comlist[i][1];
-			break;
+		newNs = i+1;
+	} else if(x == 7) {
+		// 移動
+		var ctmp = command[k];
+		var gtmp = g[k];
+		if(z > k) {
+			// 上から下へ
+			for(i = k; i < z-1; i++) {
+				command[i] = command[i+1];
+				g[i] = g[i+1];
+			}
+		} else {
+			// 下から上へ
+			for(i = k; i > z; i--) {
+				command[i] = command[i-1];
+				g[i] = g[i-1];
+			}
 		}
+		command[i] = ctmp;
+		g[i] = gtmp;
 	}
 
-	command[a] = [b,c,d,e,f];
-	ns(++a);
 	str = plchg();
 	str = "<NOBR><font color=red><b>−−−−−未送信−−−−−</b></font></NOBR><br>"+str;
-	disp(str, "white");
+	disp(str, "#CCDDFF");
 	outp();
-	menuclose();
+	document.myForm.CommandJavaButton$island->{'id'}.disabled = false;
+	ns(newNs);
 	return true;
 }
 
@@ -196,11 +215,7 @@ function plchg(){
 		y = c[2];
 		tgt = c[4];
 		point = '<FONT COLOR="#a06040"><B>' + "(" + x + "," + y + ")" + '</B></FONT>';
-		for(j = 0; j < islname.length ; j++) {
-			if(tgt == islname[j][0]){
-				tgt = '<FONT COLOR="#a06040"><B>' + islname[j][1] + "島" + '</B></FONT>';
-			}
-		}
+	 	tgt = '<FONT COLOR="#a06040"><B>' + islname[tgt] + "島" + '</B></FONT>';
 		if(c[0] == $HcomDoNothing || c[0] == $HcomAutoPrepare3){ // 資金繰り 一括自動地ならし
 			strn2 = kind;
 		} else if(c[0] == $HcomMissileNM || // ミサイル関連
@@ -232,9 +247,14 @@ function plchg(){
 		tmpnum = '';
 		if(i < 9){ tmpnum = '0'; }
 			strn1 += 
-			'<A STYLE="text-decoration:none;color:000000" HREF="JavaScript:void(0);" onClick="ns(' + i + ')"><NOBR>' +
+			'<div id="com_'+i+'" '+
+			'onmouseover="mc_over('+i+');return false;" '+
+			'><A STYLE="text-decoration:none;color:000000" HREF="JavaScript:void(0);" onClick="ns(' + i + ')" '+
+			'onmousedown="return comListMove('+i+');" '+
+			'><NOBR>' +
+
 			tmpnum + (i + 1) + ':' +
-			strn2 + '</NOBR></A><BR>\\n';
+			strn2 + '</NOBR></A></div>\\n';
 		}
 	return strn1;
 }
@@ -242,20 +262,15 @@ function plchg(){
 function disp(str,bgclr){
 	if(str==null)  str = "";
 
-	if(isNN6) {
-		el = document.getElementById("LINKMSG1");
-		el.innerHTML = str;
-		document.getElementById("plan").bgColor = bgclr;
-	} else if(isIE4) {
-		el = document.all("LINKMSG1");
-		el.innerHTML = str;
-		document.all.plan.bgColor = bgclr;
-	} else if(isNN4) {
+	if(document.getElementById || document.all){
+		LayWrite('LINKMSG1', str);
+		SetBG('plan', bgclr);
+	} else if(document.layers) {
 		lay = document.layers["PARENT_LINKMSG"].document.layers["LINKMSG1"];
 		lay.document.open();
 		lay.document.write("<font style='font-size:11pt'>"+str+"</font>");
 		lay.document.close(); 
-		document.layers["PARENT_LINKMSG"].bgColor = bgclr;
+		SetBG("PARENT_LINKMSG", bgclr);
 	}
 }
 
@@ -277,16 +292,17 @@ function ps(x, y) {
    if(document.mark_form.mark.checked) {
       set_mark(x, y);
    } else {
-      document.forms[0].elements[4].options[x].selected = true;
-      document.forms[0].elements[5].options[y].selected = true;
-      showMenu();
+      document.myForm.POINTX.options[x].selected = true;
+      document.myForm.POINTY.options[y].selected = true;
+      moveLAYER("menu",mx+10,my-50);
    }
    return true;
 }
 
 function ns(x) {
 	if (x == $HcommandMax){ return true; }
-	document.forms[0].elements[2].options[x].selected = true;
+	document.myForm.NUMBER.options[x].selected = true;
+	selCommand(x);
 	return true;
 }
 
@@ -323,60 +339,194 @@ function jump(theForm) {
 	if (url != "" ) window.open("$HthisFile?IslandMap=" +url,"", "menubar=yes,toolbar=no,location=no,directories=no,status=yes,scrollbars=yes,resizable=yes,width=450,height=630");
 }
 
-function showMenu() {
-	if((isNN6) && !(isIE4)){
-		document.getElementById("menu").style.left = mouseX;
-		document.getElementById("menu").style.top = mouseY - 50;
-		document.getElementById("menu").style.display = "block";
-		document.getElementById("menu").style.visibility = "visible";
-	} else if(isNN4) {
-		var def = 0;
-		var y_ = window.pageYOffset;
-		var left_def = (mouseY - y_) - (innerHeight - 169);
-		if((mouseY - y_) < 28) { def = 28 - (mouseY - y_); }
-		if(left_def > 0) { def = - left_def; }
-		document.menu.left = mouseX; // 横
-		document.menu.top  = mouseY - 30 + def; // 縦
-		document.menu.visibility = "show";
-	} else if(isIE4) {
-		var def = 0;
-		var left_def = event.clientY - (document.body.clientHeight - 138);
-		if(event.clientY < 80) { def = 80 - event.clientY; }
-		if(left_def > 0) { def = - left_def; }
-		menu.style.left= event.clientX + document.body.scrollLeft;
-		menu.style.top = event.clientY + document.body.scrollTop - 80 + def;
-		menu.style.display = "block";
-		menu.style.visibility = "visible";
-	}
+function moveLAYER(layName,x,y){
+   if(document.getElementById){		//NN6,IE5
+      el = document.getElementById(layName);
+      el.style.left = x;
+      el.style.top  = y;
+   } else if(document.layers){				//NN4
+      msgLay = document.layers[layName];
+      msgLay.moveTo(x,y);
+   } else if(document.all){				//IE4
+      msgLay = document.all(layName).style;
+      msgLay.pixelLeft = x;
+      msgLay.pixelTop = y;
+   }
 }
 
 function menuclose() {
-	if(isNN6) {
-		document.getElementById("menu").style.display = "none";
-	} else if(isNN4) {
-		document.menu.visibility = "hide";
-	} else {
-		window["menu"].style.display = "none";
-	}
+   moveLAYER("menu",-500,-500);
 }
 
 function Mmove(e){
-   mouseX = e.pageX;
-   mouseY = e.pageY;
+   if(document.all){
+      mx = event.x + document.body.scrollLeft;
+      my = event.y + document.body.scrollTop;
+   }else if(document.layers){
+      mx = e.pageX;
+      my = e.pageY;
+   }else if(document.getElementById){
+      mx = e.pageX;
+      my = e.pageY;
+   }
+
+   return moveLay.move();
 }
 
-function check_menu(){
-   if((isNN6) && !(isIE4)) {
-      document.onmousemove = Mmove;
-   } else if(isNN4){
-      window.captureEvents(Event.MOUSEMOVE);
-      window.onMouseMove = Mmove;
+function LayWrite(layName, str) {
+   if(document.getElementById){
+      document.getElementById(layName).innerHTML = str;
+   } else if(document.all){
+      document.all(layName).innerHTML = str;
+   } else if(document.layers){
+      lay = document.layers[layName];
+      lay.document.open();
+      lay.document.write(str);
+      lay.document.close(); 
    }
+}
+
+function SetBG(layName, bgclr) {
+   if(document.getElementById) document.getElementById(layName).style.backgroundColor = bgclr;
+   else if(document.all)       document.all.layName.bgColor = bgclr;
+   //else if(document.layers)    document.layers[layName].bgColor = bgclr;
+}
+
+var oldNum=0;
+function selCommand(num) {
+   document.getElementById('com_'+oldNum).style.backgroundColor = '';
+   document.getElementById('com_'+num).style.backgroundColor = '#FFFFAA';
+   oldNum = num;
+}
+
+
+/* コマンド ドラッグ＆ドロップ用追加スクリプト */
+var moveLay = new MoveFalse();
+
+var newLnum = -2;
+var Mcommand = false;
+
+function Mup() {
+   moveLay.up();
+   moveLay = new MoveFalse();
+}
+
+function setBorder(num, color) {
+   if(document.getElementById) {
+      if(color.length == 4) document.getElementById('com_'+num).style.borderTop = ' 1px solid '+color;
+      else document.getElementById('com_'+num).style.border = '0px';
+   }
+}
+
+function mc_out() {
+   if(Mcommand && newLnum >= 0) {
+      setBorder(newLnum, '');
+      newLnum = -1;
+   }
+}
+
+function mc_over(num) {
+   if(Mcommand) {
+      if(newLnum >= 0) setBorder(newLnum, '');
+      newLnum = num;
+      setBorder(newLnum, '#116');    // blue
+   }
+}
+
+function comListMove(num) { moveLay = new MoveComList(num); return (document.layers) ? true : false; }
+
+function MoveFalse() {
+   this.move = function() { }
+   this.up   = function() { }
+}
+
+function MoveComList(num) {
+   var setLnum  = num;
+   Mcommand = true;
+
+   LayWrite('mc_div', '<NOBR><strong>'+(num+1)+': '+g[num]+'</strong></NOBR>');
+
+   this.move = function() {
+      moveLAYER('mc_div',mx+10,my-30);
+      return false;
+   }
+
+   this.up   = function() {
+      if(newLnum >= 0) {
+         var com = command[setLnum];
+         cominput(7,setLnum,newLnum);
+      }
+      else if(newLnum == -1) cominput(3,setLnum+1);
+
+      mc_out();
+      newLnum = -2;
+
+      Mcommand = false;
+      moveLAYER("mc_div",-50,-50);
+   }
+}
+
+
+/* 画面遷移無しでのコマンド送信用追加スクリプト */
+
+function new_http() {
+   if(document.getElementById) {
+      try{
+         return new ActiveXObject("Msxml2.XMLHTTP");
+      } catch (e){
+         try {
+            return new ActiveXObject("Microsoft.XMLHTTP");
+         } catch (E){
+            if(typeof XMLHttpRequest != 'undefined') return new XMLHttpRequest;
+         }
+      }
+   }
+}
+
+function send_command(form) {
+   if (!xmlhttp) return true;
+
+   form.CommandJavaButton$island->{'id'}.disabled = true;
+
+   var progress  = document.getElementById('progress');
+   progress.innerHTML = '<blink>Sending...</blink>';
+
+   if (xmlhttp.readyState == 1 || xmlhttp.readyState == 2 || xmlhttp.readyState == 3) return; 
+
+   xmlhttp.open("POST", "$HthisFile", true);
+   if(!window.opera) xmlhttp.setRequestHeader("referer", "$HthisFile");
+
+   xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+         var result = xmlhttp.responseText;
+         if(result.indexOf('OK') == 0 || result.indexOf('OK') == 2048) {
+            str = plchg();
+            str = "<font color=blue>−−−− 送信済み −−−−</font><br>"+str;
+            disp(str, "#CCFFDD");
+            selCommand(document.myForm.NUMBER.selectedIndex);
+         } else {
+            alert("送信に失敗しました。");
+            form.CommandJavaButton$island->{'id'}.disabled = false;
+         }
+         progress.innerHTML = '';
+      }
+   }
+
+   var post;
+   post += 'async=true&';
+   post += 'CommandJavaButton$island->{'id'}=true&';
+   post += 'JAVAMODE=java&';
+   post += 'COMARY='+form.COMARY.value+'&';
+   post += 'PASSWORD='+form.PASSWORD.value+'&';
+
+   xmlhttp.send(post);
+   return false;
 }
 
 //-->
 </SCRIPT>
-<DIV ID="menu" STYLE="position:absolute; visibility:hidden;">
+<DIV ID="mc_div" style="background-color:white;position:absolute;top:-50;left:-50;height:1.2em">&nbsp;</DIV>
+<DIV ID="menu" style="position:absolute; top:-500;left:-500;"> 
 <TABLE BORDER=0 BGCOLOR=#ccffcc>
 <TR><TD NOWRAP>
 
@@ -414,17 +564,16 @@ END
 <TR valign=top>
 <TD $HbgInputCell >
 <CENTER>
-<FORM name="myForm" action="$HthisFile" method=POST>
+<FORM name="myForm" action="$HthisFile" method=POST onsubmit="return send_command(this);">
 <BR><nobr><center>ミサイル発射上限数[<b> $island->{'fire'} </b>]発</center></nobr><BR>
 <INPUT TYPE=HIDDEN NAME=PASSWORD VALUE="$HdefaultPassword">
-<INPUT TYPE=submit VALUE="計画送信" NAME=CommandJavaButton$Hislands[$HcurrentNumber]->{'id'}>
 <HR>
 <B>動 作<BR>
 <A HREF=JavaScript:void(0); onClick="cominput(1)">挿入</A>　
 <A HREF=JavaScript:void(0); onClick="cominput(2)">上書き</A>　
 <A HREF=JavaScript:void(0); onClick="cominput(3)">削除</A></B>
 <HR>
-<B>計画番号</B><SELECT NAME=NUMBER>
+<B>計画番号</B><SELECT NAME=NUMBER onchange="selCommand(this.selectedIndex)">
 END
 	# 計画番号
 	my($j, $i);
@@ -506,7 +655,8 @@ END
 <HR>
 <INPUT TYPE="hidden" NAME="COMARY" value="comary">
 <INPUT TYPE="hidden" NAME=JAVAMODE value="$HjavaMode">
-<INPUT TYPE=submit VALUE="計画送信" NAME=CommandJavaButton$Hislands[$HcurrentNumber]->{'id'}>
+<INPUT TYPE=submit VALUE="計画送信" NAME=CommandJavaButton$island->{'id'}>
+<span id="progress"></span
 <p><font size=2>最後に<font color=red>計画送信ボタン</font>を<br>押すのを忘れないように。</font>
 </CENTER><BR>
 </TD>
@@ -522,7 +672,7 @@ END
 	my $comment = $Hislands[$HcurrentNumber]->{'comment'};
 	out(<<END);
 </TD>
-<TD $HbgCommandCell id="plan">
+<TD $HbgCommandCell id="plan" onmouseout="mc_out();return false;">
 <ilayer name="PARENT_LINKMSG" width="100%" height="100%">
    <layer name="LINKMSG1" width="200"></layer>
    <span id="LINKMSG1"></span>
@@ -568,23 +718,25 @@ sub commandJavaMain {
 	for($i = 0; $i < $HcommandMax; $i++) {
 		# コマンド登録
 		$HcommandComary =~ s/([0-9]*) ([0-9]*) ([0-9]*) ([0-9]*) ([0-9]*) //;
-		if($1 == 0) {
-			$1 = 41;
-		}
 		$command->[$i] = {
-			'kind' => $1,
+			'kind' => $1==0 ? $HcomDoNothing : $1,
 			'x' => $2,
 			'y' => $3,
 			'arg' => $4,
 			'target' => $5
 		};
 	}
-	tempCommandAdd();
 	# データの書き出し
 	writeIslandsFile($HcurrentID);
 
-	# owner modeへ
-	ownerMain();
+	if($Hasync) {
+		unlock();
+		out("OK");
+	} else {
+		tempCommandAdd();
+		# owner modeへ
+		ownerMain();
+	}
 }
 
 #----------------------------------------------------------------------
@@ -637,13 +789,13 @@ function ps(x, y) {
 
 function showMenu() {
 	if((isNN6) && !(isIE4)){
-		document.getElementById("menu").style.left = mouseX;
-		document.getElementById("menu").style.top = mouseY - 20;
+		document.getElementById("menu").style.left = mx;
+		document.getElementById("menu").style.top = my - 20;
 		document.getElementById("menu").style.visibility = "visible";
 		document.getElementById("menu").style.display = "block";
 	} else if(isNN4) {
-		document.menu.left = mouseX; // 横
-		document.menu.top  = mouseY - 15; // 縦
+		document.menu.left = mx; // 横
+		document.menu.top  = my - 15; // 縦
 		document.menu.visibility = "show";
 	} else if(isIE4) {
 		menu.style.visibility = 'visible';
@@ -664,11 +816,11 @@ function menuclose() {
 }
 
 function getMouseData(e) {
-	mouseX = e.pageX;
-	mouseY = e.pageY;
+	mx = e.pageX;
+	my = e.pageY;
 }
 function cominput(kind) {
-	window.opener.cominput(6, kind, $HcurrentID);
+	window.opener.cominput(6, kind, '', $HcurrentID);
 	menuclose();
 }
 

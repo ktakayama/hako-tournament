@@ -275,6 +275,7 @@ sub tempHeader {
 	$baseIMG =~ s/筑集眺餅/デスクトップ/g;
 
 	out("Content-type: text/html\n\n");
+	return if($Hasync);
 
 	if($Hmobile == 0) {
 		my $bbTime = get_time((stat($bbsLog))[9], 1, 1);
