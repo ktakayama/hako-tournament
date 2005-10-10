@@ -33,7 +33,7 @@ sub newIslandMain {
 	}
 
 	# 名前が正当かチェック
-	if($HcurrentName =~ /[,\"\?\(\)\<\>\$]|^無人$/) {
+	if($HcurrentName =~ /[\\,\"\?\(\)\<\>\$]|^無人$/) {
 		# 使えない名前
 		unlock();
 		tempNewIslandBadName();
@@ -297,7 +297,7 @@ sub changeMain {
 	if($HcurrentName ne '') {
 		# 名前変更の場合		
 		# 名前が正当かチェック
-		if($HcurrentName =~ /[,\"\?\(\)\<\>]|^無人$/) {
+		if($HcurrentName =~ /[\\,\"\?\(\)\<\>]|^無人$/) {
 			# 使えない名前
 			unlock();
 			tempNewIslandBadName();
