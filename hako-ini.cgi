@@ -28,7 +28,7 @@ $masterPassword		= 'master';					# マスターパスワード
 $HspecialPassword	= 'special';				# 特殊パスワード
 $adminName			= '管理者の名前';			# 管理者名
 $email				= '管理者@どこ.どこ.どこ';	# 管理者のメールアドレス
-$version			= "0.95";					# バージョン表記用（基本的に変更しないように！）
+$version			= "0.96";					# バージョン表記用（基本的に変更しないように！）
 
 $HdirMode			= 0755;						# データディレクトリのパーミッション
 $HdirName			= 'data';					# データディレクトリの名前
